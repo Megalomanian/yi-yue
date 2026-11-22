@@ -1,0 +1,67 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+autonumber
+
+participant "送样人" as U
+participant "小程序/H5 前端" as FE
+participant "预约控制器" as C
+participant "冲突校验服务" as S
+participant "Redis 分布式锁" as R
+participant "MySQL 主库" as DB
+participant "消息服务" as MQ
+
+U -> FE : 选择仪器与时段，填写样品数与检测项目
+FE -> FE : 校验必填项与资质状态
+FE -> C : POST /api/reservations
+activate C
+C -> C : JWT 鉴权、越权校验
+C -> S : 校验时段唯一性(仪器ID, 时段ID, 用户ID)
+activate S
+
+S -> R : SET lock:slot:{仪器ID}:{时段ID} NX PX 10000
+activate R
+alt 未取得分布式锁
+  R --> S : nil
+  S --> C : 系统繁忙，请重试
+  C --> FE : 409 提交失败
+  FE --> U : 提示"当前预约人数较多，请稍后重试"
+else 取得分布式锁
+  R --> S : OK
+  S -> DB : SELECT 时段与预约单 FOR UPDATE
+  activate DB
+  DB --> S : 时段占用情况
+  deactivate DB
+
+  alt 时段已被占用
+    S -> DB : INSERT 候补队列(时段ID, 用户ID, 排队序号)
+    activate DB
+    DB --> S : 候补序号
+    deactivate DB
+    S --> C : 冲突，已进入候补
+    C -> MQ : 发送"已进入候补"通知
+    C --> FE : 202 候补受理
+    FE --> U : 展示候补序号与预计释放时间
+  else 时段可预约
+    S -> DB : INSERT 预约单(status=Pending, version=0)
+    activate DB
+    DB --> S : 预约单号
+    deactivate DB
+    S -> DB : UPDATE 时段状态为锁定
+    S --> C : 校验通过，返回预约单
+    C -> MQ : 发送"待审批"通知给仪器负责人
+    C --> FE : 201 预约单号与待审批状态
+    FE --> U : 显示"待审批"，提示等待机组审批
+  end
+
+  S -> R : DEL lock:slot:{仪器ID}:{时段ID}
+end
+deactivate R
+deactivate S
+deactivate C
+
+note over S, DB
+  三重保障：Redis 分布式锁串行化提交、
+  MySQL 唯一约束兜底、预约单 version 乐观锁
+end note
+@enduml

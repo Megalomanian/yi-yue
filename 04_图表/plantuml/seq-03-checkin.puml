@@ -1,0 +1,83 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+autonumber
+
+participant "送样人" as U
+participant "微信小程序" as MP
+participant "签到服务" as C
+participant "计时服务" as T
+participant "计费服务" as B
+participant "MySQL 主库" as DB
+participant "微信支付/经费卡" as PAY
+participant "消息服务" as MQ
+
+U -> MP : 到机位扫描仪器二维码
+MP -> C : POST /api/checkin {仪器ID, 二维码令牌}
+activate C
+C -> DB : 查询当日已批准预约单与上机资质
+activate DB
+DB --> C : 预约单(Approved)、资质有效期
+deactivate DB
+
+alt 无有效预约或资质失效
+  C --> MP : 403 不允许上机
+  MP --> U : 提示"无有效预约或资质已过期"
+else 校验通过
+  C -> DB : UPDATE 预约单 SET status=InUse, checkin_time=NOW()
+  activate DB
+  DB --> C : 影响行数 1
+  deactivate DB
+  C -> T : 开始计时(预约单ID, 仪器ID, 开始时间)
+  activate T
+  T -> DB : INSERT 机时记录(start_time, status=Running)
+  T --> C : 计时已启动
+  deactivate T
+  C --> MP : 200 签到成功，开始计时
+  MP --> U : 展示"使用中"与已用时
+  deactivate C
+
+  U -> MP : 完成检测，点击"下机"
+  MP -> C : POST /api/checkout {预约单ID}
+  activate C
+  C -> T : 停止计时(预约单ID)
+  activate T
+  T -> DB : UPDATE 机时记录 SET end_time=NOW(), duration=?
+  T --> C : 实际机时(小时，保留 2 位)
+  deactivate T
+  C -> B : 结算(预约单ID, 实际机时, 用户类型)
+  activate B
+  B -> DB : 查询单价规则(校内/校外、按时/按样品)
+  activate DB
+  DB --> B : 单价与计费规则
+  deactivate DB
+  B -> B : 金额 = 实际机时 × 单价 + 样品附加费
+  B -> DB : INSERT 费用单(status=待支付)
+  activate DB
+  DB --> B : 费用单号
+  deactivate DB
+  B --> C : 费用单(金额、明细)
+  deactivate B
+
+  alt 校内用户使用经费卡
+    C -> DB : 扣减经费卡额度，费用单置为已结算
+    C -> MQ : 发送"结算完成"通知
+  else 校外用户在线支付
+    C -> PAY : 创建支付单(费用单号、金额)
+    activate PAY
+    PAY --> C : 支付参数
+    deactivate PAY
+    C --> MP : 返回支付参数
+    MP -> PAY : 拉起微信支付
+    PAY --> MP : 支付结果回调
+    MP -> C : 支付结果确认
+    C -> DB : UPDATE 费用单 SET pay_status=已支付
+    C -> MQ : 发送"结算完成"通知
+  end
+
+  C -> DB : UPDATE 预约单 SET status=Completed
+  C --> MP : 结算完成，展示费用明细
+  MP --> U : 展示费用单与电子凭证
+  deactivate C
+end
+@enduml

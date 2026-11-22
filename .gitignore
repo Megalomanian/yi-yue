@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Office / OS temporary files
+~$*
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Release artifacts (published via GitHub Releases)
+system/release/

@@ -1,0 +1,85 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #F4F8FF
+  BorderColor #1F6FEB
+  FontSize 13
+}
+skinparam actor {
+  BackgroundColor #FFFFFF
+  BorderColor #333333
+}
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #1F6FEB
+  BorderThickness 1.5
+}
+
+actor "送样人\nAC-01" as AC01
+actor "仪器负责人\nAC-02" as AC02
+actor "平台管理员\nAC-03" as AC03
+actor "主管部门\nAC-04" as AC04
+actor "校外用户\nAC-05" as AC05
+actor "定时任务\nAC-06" as AC06
+
+rectangle "仪约平台" {
+  usecase "UC-01 仪器检索与\n可用时段查询" as UC01
+  usecase "UC-02 预约申请" as UC02
+  usecase "UC-03 预约审批" as UC03
+  usecase "UC-04 时段冲突校验\n与候补排队" as UC04
+  usecase "UC-05 扫码上机签到" as UC05
+  usecase "UC-06 使用计时与\n费用结算" as UC06
+  usecase "UC-07 检测结果交付" as UC07
+  usecase "UC-08 培训与\n上机资质认证" as UC08
+  usecase "UC-09 违约认定与\n信用分管理" as UC09
+  usecase "UC-10 设备维保与停用" as UC10
+  usecase "UC-11 开放共享\n绩效报表" as UC11
+  usecase "UC-12 消息通知" as UC12
+  usecase "UC-13 仪器台账管理" as UC13
+}
+
+AC01 --> UC01
+AC01 --> UC02
+AC01 --> UC05
+AC01 --> UC07
+AC05 --> UC01
+AC05 --> UC02
+AC02 --> UC03
+AC02 --> UC05
+AC02 --> UC06
+AC02 --> UC07
+AC02 --> UC08
+AC02 --> UC10
+AC03 --> UC08
+AC03 --> UC09
+AC03 --> UC11
+AC03 --> UC13
+AC04 --> UC11
+AC06 --> UC04
+AC06 --> UC09
+AC06 --> UC12
+
+UC02 ..> UC04 : <<include>>
+UC05 ..> UC06 : <<include>>
+UC02 ..> UC12 : <<include>>
+UC03 ..> UC12 : <<include>>
+UC07 ..> UC12 : <<include>>
+UC08 ..> UC12 : <<include>>
+UC10 ..> UC12 : <<include>>
+
+note bottom of UC12
+  UC-12 由 UC-02/03/07/08/10
+  统一 include，采用 include
+  而非 extend
+end note
+
+note right of UC08
+  UC-08 是 UC-02 的前置条件：
+  未取得资质者不得预约
+  需独立操作的仪器
+  （前置约束，非 include）
+end note
+
+@enduml

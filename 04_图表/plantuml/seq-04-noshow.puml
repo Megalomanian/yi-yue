@@ -1,0 +1,70 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+autonumber
+
+participant "定时任务" as J
+participant "预约服务" as S
+participant "预约单状态机" as SM
+participant "信用分服务" as CR
+participant "MySQL 主库" as DB
+participant "消息服务" as MQ
+participant "微信模板消息" as WX
+
+note over J
+  触发方式：Spring @Scheduled
+  每 5 分钟扫描一次，
+  扫描区间为开始时间已过 15 分钟
+  且未签到的已批准预约单
+end note
+
+loop 每 5 分钟
+  J -> S : 扫描超时未签到预约单
+  activate S
+  S -> DB : SELECT * FROM reservation WHERE status=Approved AND checkin_time IS NULL AND start_time < NOW() - 15min
+  activate DB
+  DB --> S : 超时预约单列表
+  deactivate DB
+
+  alt 存在超时预约单
+    loop 逐条处理超时预约单
+      S -> SM : 触发事件"15 分钟未签到"
+      activate SM
+      SM -> SM : 校验当前状态为 Approved
+      SM --> S : 允许迁移至 NoShow
+      deactivate SM
+      S -> DB : UPDATE 预约单 SET status=NoShow
+      activate DB
+      DB --> S : 影响行数 1
+      deactivate DB
+      S -> DB : 释放时段，触发候补队列补位
+      S -> CR : 记违约(用户ID, 预约单ID, 扣分)
+      activate CR
+      CR -> DB : INSERT 信用记录(change_score=-10, reason=未签到)
+      CR -> DB : UPDATE 用户信用分 = 信用分 - 10
+      CR --> S : 当前信用分
+      deactivate CR
+
+      alt 信用分低于 60
+        S -> DB : UPDATE 用户 SET 预约权限=暂停
+        S -> MQ : 发送"暂停预约权限"通知
+        activate MQ
+        MQ -> WX : 推送模板消息(违约扣分、暂停说明、复训入口)
+        WX --> MQ : 受理结果
+        MQ --> S : 事件已入队
+        deactivate MQ
+      else 信用分不低于 60
+        S -> MQ : 发送"违约认定"通知
+        activate MQ
+        MQ -> WX : 推送模板消息(违约时间、扣分、申诉入口)
+        WX --> MQ : 受理结果
+        MQ --> S : 事件已入队
+        deactivate MQ
+      end
+    end
+  else 无超时预约单
+    S --> J : 本轮无待处理记录
+  end
+  deactivate S
+end
+@enduml

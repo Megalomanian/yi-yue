@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-11-11T07:16:27.522Z",
+  "environment": "localhost HTTP, H2 in-memory, Java 21, no coverage agent",
+  "requests": 500,
+  "counts": {
+    "Waitlisted": 499,
+    "Pending": 1
+  },
+  "p95_ms": 2225.68,
+  "max_ms": 2309.01,
+  "elapsed_ms": 2312.21,
+  "oversold": false,
+  "target_p95_ms": 800,
+  "target_met": false
+}

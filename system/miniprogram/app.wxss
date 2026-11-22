@@ -1,0 +1,99 @@
+page {
+  background: #f4f6fa;
+  color: #253b55;
+  font-family: system-ui;
+  font-size: 28rpx;
+}
+.page {
+  padding: 32rpx;
+}
+.card {
+  background: white;
+  border: 1rpx solid #e1e8f1;
+  border-radius: 18rpx;
+  margin-bottom: 24rpx;
+  padding: 30rpx;
+}
+.title {
+  font-size: 38rpx;
+  font-weight: 600;
+  margin: 12rpx 0 20rpx;
+}
+.subtitle {
+  color: #7f91a5;
+  font-size: 24rpx;
+  line-height: 1.8;
+  margin: 12rpx 0 24rpx;
+}
+.primary {
+  background: #1f6feb !important;
+  color: white !important;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+.secondary {
+  color: #1f6feb;
+  background: #edf3ff;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  margin-top: 16rpx;
+}
+input,
+textarea,
+picker {
+  background: #f5f7fb;
+  border: 1rpx solid #e1e8f1;
+  border-radius: 10rpx;
+  padding: 22rpx;
+  margin: 18rpx 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+.tag {
+  display: inline-block;
+  color: #2b875e;
+  background: #e8f6ee;
+  border-radius: 8rpx;
+  padding: 8rpx 16rpx;
+  font-size: 22rpx;
+}
+.price {
+  font-size: 36rpx;
+  color: #2767ba;
+  font-weight: 600;
+  margin: 20rpx 0;
+}
+.label {
+  color: #7d8fa4;
+  font-size: 24rpx;
+  margin-top: 22rpx;
+}
+.empty {
+  text-align: center;
+  color: #8b9aab;
+  padding: 80rpx 30rpx;
+  line-height: 2;
+}
+.row {
+  display: flex;
+  gap: 20rpx;
+  align-items: center;
+  justify-content: space-between;
+}
+.row button {
+  flex: 1;
+  margin: 12rpx 0;
+}
+.error {
+  color: #be534a;
+  font-size: 24rpx;
+}
+.notice {
+  background: #edf4ff;
+  padding: 24rpx;
+  color: #587da8;
+  font-size: 24rpx;
+  border-radius: 12rpx;
+  line-height: 1.8;
+  margin-bottom: 24rpx;
+}

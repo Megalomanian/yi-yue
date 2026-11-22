@@ -1,0 +1,54 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+hide empty description
+
+state "草稿\nDraft" as Draft
+state "待审批\nPending" as Pending
+state "已批准\nApproved" as Approved
+state "候补中\nWaitlisted" as Waitlisted
+state "使用中\nInUse" as InUse
+state "已完成\nCompleted" as Completed
+state "已驳回\nRejected" as Rejected
+state "已违约\nNoShow" as NoShow
+state "已取消\nCancelled" as Cancelled
+
+[*] --> Draft : 创建预约单
+
+Draft --> Pending : 提交
+Pending --> Approved : 审批通过
+Pending --> Rejected : 审批驳回
+Pending --> Waitlisted : 时段已满
+Waitlisted --> Approved : 有人取消
+
+Approved --> InUse : 扫码签到
+Approved --> NoShow : 15 分钟未签到
+InUse --> Completed : 下机结算
+
+Approved --> Cancelled : 用户取消
+Waitlisted --> Cancelled : 用户取消
+Approved --> Cancelled : 仪器停用（系统代取消，全额免违约）
+
+Completed --> [*]
+Rejected --> [*]
+NoShow --> [*]
+Cancelled --> [*]
+
+note right of Pending
+  审批期间时段保持锁定，
+  审批驳回后释放时段
+  并触发候补补位
+end note
+
+note right of Waitlisted
+  候补队列由 UC-04 维护，
+  时段释放时按排队序号
+  自动补位转为已批准
+end note
+
+note bottom of NoShow
+  违约认定由 UC-09 处理：
+  扣信用分 10 分，
+  低于 60 分暂停预约权限
+end note
+@enduml

@@ -1,0 +1,14 @@
+{
+  "description": "仪约原生微信小程序",
+  "projectname": "InstrumentHub",
+  "miniprogramRoot": "./",
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "backend": {
+    "{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation": "https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd",
+    "version": "3.0",
+    "name": "cn.instrumenthub.HubIntegrationTest",
+    "time": "42.527",
+    "tests": "37",
+    "errors": "0",
+    "skipped": "0",
+    "failures": "0"
+  },
+  "coverage": {
+    "INSTRUCTION": {
+      "covered": 7585,
+      "missed": 1670,
+      "percent": 81.96
+    },
+    "BRANCH": {
+      "covered": 317,
+      "missed": 163,
+      "percent": 66.04
+    },
+    "LINE": {
+      "covered": 1035,
+      "missed": 204,
+      "percent": 83.54
+    },
+    "COMPLEXITY": {
+      "covered": 218,
+      "missed": 205,
+      "percent": 51.54
+    },
+    "METHOD": {
+      "covered": 119,
+      "missed": 63,
+      "percent": 65.38
+    },
+    "CLASS": {
+      "covered": 18,
+      "missed": 3,
+      "percent": 85.71
+    }
+  },
+  "browser": {
+    "startTime": "2026-11-11T07:22:15.606Z",
+    "duration": 17354.463,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "http_load": {
+    "timestamp": "2026-11-11T07:16:27.522Z",
+    "environment": "localhost HTTP, H2 in-memory, Java 21, no coverage agent",
+    "requests": 500,
+    "counts": {
+      "Waitlisted": 499,
+      "Pending": 1
+    },
+    "p95_ms": 2225.68,
+    "max_ms": 2309.01,
+    "elapsed_ms": 2312.21,
+    "oversold": false,
+    "target_p95_ms": 800,
+    "target_met": false
+  },
+  "capacity": [
+    "500",
+    "200000",
+    "3964"
+  ],
+  "service_concurrency": [
+    [
+      "100",
+      "1",
+      "99",
+      "317"
+    ],
+    [
+      "500",
+      "1",
+      "499",
+      "1021"
+    ]
+  ]
+}

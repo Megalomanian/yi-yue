@@ -1,0 +1,129 @@
+{
+  "project": "仪约 - 高校大型仪器设备开放共享预约平台",
+  "exported_at": "2026-11-03T23:50:24",
+  "source": "OpenCode 本地会话库 opencode.db",
+  "format": "JSONL（每行一条 JSON 对象，UTF-8 无 BOM）",
+  "note": "reasoning（模型内部推理）不导出；工具输出超长部分已截断并标注 output_len / output_truncated。",
+  "sessions": [
+    {
+      "session_id": "ses_e8010d5bfffeXiPj9KKrtjwQwS",
+      "title": "阅读需求规格说明书模板与开题要求",
+      "parent_id": null,
+      "model": {
+        "provider": "workbuddy",
+        "id": "deepseek-v4.1-flash",
+        "variant": "high"
+      },
+      "start": "2026-10-28T08:35:43.061",
+      "end": "2026-11-03T23:50:08.725",
+      "duration_min": 9554.4,
+      "records": 199,
+      "file": "01_主会话.jsonl",
+      "bytes": 449245,
+      "sha256_16": "143fd6623be5113d"
+    },
+    {
+      "session_id": "ses_e800745c7ffezp6bhZId0hqBMg",
+      "title": "A3 SRS 正文",
+      "parent_id": "ses_e8010d5bfffeXiPj9KKrtjwQwS",
+      "model": {
+        "provider": "workbuddy",
+        "id": "deepseek-v4.1-flash",
+        "variant": null
+      },
+      "start": "2026-10-28T08:46:09.517",
+      "end": "2026-10-28T08:50:03.351",
+      "duration_min": 3.9,
+      "records": 17,
+      "file": "04_A3_SRS正文.jsonl",
+      "bytes": 91859,
+      "sha256_16": "4d0da5d3a45e3d82"
+    },
+    {
+      "session_id": "ses_e800745c3ffe4XvCaFnGbtNzut",
+      "title": "A4 事实核验",
+      "parent_id": "ses_e8010d5bfffeXiPj9KKrtjwQwS",
+      "model": {
+        "provider": "workbuddy",
+        "id": "deepseek-v4.1-flash",
+        "variant": null
+      },
+      "start": "2026-10-28T08:46:09.557",
+      "end": "2026-10-28T08:49:36.786",
+      "duration_min": 3.5,
+      "records": 35,
+      "file": "05_A4_事实核验.jsonl",
+      "bytes": 45748,
+      "sha256_16": "af30154c1cea42c1"
+    },
+    {
+      "session_id": "ses_e800745caffeWKt3zG2RO0UAOT",
+      "title": "A2 需求建模图",
+      "parent_id": "ses_e8010d5bfffeXiPj9KKrtjwQwS",
+      "model": {
+        "provider": "workbuddy",
+        "id": "deepseek-v4.1-flash",
+        "variant": null
+      },
+      "start": "2026-10-28T08:46:09.595",
+      "end": "2026-10-28T08:52:10.688",
+      "duration_min": 6.0,
+      "records": 30,
+      "file": "03_A2_需求建模图.jsonl",
+      "bytes": 56774,
+      "sha256_16": "42ddfe0347b7815c"
+    },
+    {
+      "session_id": "ses_e800745ceffe9pvBSxbiPIIx2k",
+      "title": "A1 开题报告正文",
+      "parent_id": "ses_e8010d5bfffeXiPj9KKrtjwQwS",
+      "model": {
+        "provider": "workbuddy",
+        "id": "deepseek-v4.1-flash",
+        "variant": null
+      },
+      "start": "2026-10-28T08:46:09.650",
+      "end": "2026-10-28T08:49:21.374",
+      "duration_min": 3.2,
+      "records": 13,
+      "file": "02_A1_开题报告正文.jsonl",
+      "bytes": 78210,
+      "sha256_16": "fd92ed1ca5fb4038"
+    },
+    {
+      "session_id": "ses_e7f1ced41ffeWVRCauyGQ7u8R7",
+      "title": "R2 SRS对齐v2",
+      "parent_id": "ses_e8010d5bfffeXiPj9KKrtjwQwS",
+      "model": {
+        "provider": "workbuddy",
+        "id": "deepseek-v4.1-flash",
+        "variant": null
+      },
+      "start": "2026-10-28T13:02:07.651",
+      "end": "2026-10-28T13:07:41.104",
+      "duration_min": 5.6,
+      "records": 36,
+      "file": "07_R2_SRS修订.jsonl",
+      "bytes": 58521,
+      "sha256_16": "4392bd04c5d381b8"
+    },
+    {
+      "session_id": "ses_e7f1ced46ffeQOhbvG1iJcI1PW",
+      "title": "R1 开题报告对齐v2",
+      "parent_id": "ses_e8010d5bfffeXiPj9KKrtjwQwS",
+      "model": {
+        "provider": "workbuddy",
+        "id": "deepseek-v4.1-flash",
+        "variant": null
+      },
+      "start": "2026-10-28T13:02:07.704",
+      "end": "2026-10-28T13:12:35.545",
+      "duration_min": 10.5,
+      "records": 12,
+      "file": "06_R1_开题报告修订.jsonl",
+      "bytes": 77846,
+      "sha256_16": "784f0665ec5f7f73"
+    }
+  ],
+  "total_records": 342
+}

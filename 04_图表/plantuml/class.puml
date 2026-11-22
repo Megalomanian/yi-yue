@@ -1,0 +1,158 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam class {
+  BackgroundColor #F7FAFF
+  BorderColor #1F6FEB
+  FontSize 12
+  AttributeFontSize 11
+}
+hide empty members
+hide circle
+
+package "核心业务（实体类）" #FFFFFF {
+
+  class "User 用户" as User <<entity>> {
+    userId : Long
+    name : String
+    userType : Enum
+    deptId : Long
+    creditScore : Int
+    status : Enum
+  }
+
+  class "Instrument 仪器" as Instrument <<entity>> {
+    instId : Long
+    name : String
+    model : String
+    category : String
+    price : Decimal
+    calibers : Set<String>
+    openStatus : Enum
+  }
+
+  class "InstrumentGroup 机组" as Group <<entity>> {
+    groupId : Long
+    groupName : String
+    ownerId : Long
+    deptId : Long
+  }
+
+  class "Slot 时段" as Slot <<entity>> {
+    slotId : Long
+    instId : Long
+    startTime : DateTime
+    endTime : DateTime
+    status : Enum
+  }
+
+  class "Reservation 预约单" as Reservation <<entity>> {
+    resId : Long
+    userId : Long
+    slotId : Long
+    status : Enum
+    sampleCount : Int
+    submitTime : DateTime
+  }
+
+  class "FeeBill 费用单" as FeeBill <<entity>> {
+    billId : Long
+    resId : Long
+    machineHour : Decimal
+    amount : Decimal
+    payStatus : Enum
+  }
+
+  class "TestReport 检测报告" as Report <<entity>> {
+    reportId : Long
+    resId : Long
+    fileUrl : String
+    uploadTime : DateTime
+    archiveStatus : Enum
+  }
+
+  class "MaintenanceRecord 维保记录" as Maint <<entity>> {
+    maintId : Long
+    instId : Long
+    type : Enum
+    startTime : DateTime
+    endTime : DateTime
+  }
+}
+
+package "支撑业务（实体类）" #FFFFFF {
+
+  class "Qualification 资质" as Qual <<entity>> {
+    qualId : Long
+    userId : Long
+    instCategory : String
+    issueTime : Date
+    expireTime : Date
+    status : Enum
+  }
+
+  class "CreditRecord 信用记录" as Credit <<entity>> {
+    recordId : Long
+    userId : Long
+    changeValue : Int
+    reason : String
+    createTime : DateTime
+  }
+
+  class "NotifyMessage 通知" as Notify <<entity>> {
+    msgId : Long
+    userId : Long
+    type : Enum
+    content : String
+    readFlag : Boolean
+  }
+
+  class "Role 角色" as Role <<entity>> {
+    roleId : Long
+    roleName : String
+    scope : Enum
+  }
+}
+
+package "控制类" #FFFFFF {
+  class "ReservationCtrl 预约控制" as CtrlRes <<control>>
+  class "ConflictCtrl 冲突校验控制" as CtrlConf <<control>>
+  class "BillingCtrl 计费控制" as CtrlBill <<control>>
+  class "QualificationCtrl 资质控制" as CtrlQual <<control>>
+  class "ReportCtrl 报表控制" as CtrlRep <<control>>
+}
+
+package "边界类" #FFFFFF {
+  class "MiniAppUI 小程序界面" as B1 <<boundary>>
+  class "AdminUI 管理端界面" as B2 <<boundary>>
+  class "NotifyGateway 消息网关" as B3 <<boundary>>
+}
+
+User "1" -- "0..*" Reservation : 提交
+Instrument "1" -- "0..*" Slot : 开放
+Instrument "1" -- "1" Group : 归属
+Group "1" -- "1" User : 负责人
+Slot "1" -- "0..1" Reservation : 占用
+Reservation "1" -- "0..1" FeeBill : 结算
+Reservation "1" -- "0..1" Report : 交付
+Instrument "1" -- "0..*" Maint : 维保
+User "1" -- "0..*" Qual : 持有
+User "1" -- "0..*" Credit : 产生
+User "1" -- "0..*" Notify : 接收
+Role "1" -- "0..*" User : 授予
+
+CtrlRes ..> Reservation
+CtrlRes ..> CtrlConf
+CtrlConf ..> Slot
+CtrlBill ..> FeeBill
+CtrlBill ..> Reservation
+CtrlQual ..> Qual
+CtrlRep ..> FeeBill
+B1 ..> CtrlRes
+B2 ..> CtrlRep
+B3 ..> Notify
+CtrlRes ..> B3
+
+@enduml

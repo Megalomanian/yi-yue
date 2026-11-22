@@ -1,0 +1,78 @@
+@startuml
+skinparam defaultFontName "Microsoft YaHei"
+skinparam dpi 150
+autonumber
+
+participant "仪器负责人" as P
+participant "PC 管理端" as PC
+participant "审批服务" as A
+participant "MySQL 主库" as DB
+participant "消息服务" as MQ
+participant "微信模板消息" as WX
+
+P -> PC : 登录并进入"待我审批"列表
+PC -> A : GET /api/approvals?status=Pending
+activate A
+A -> DB : 查询本机组待审批预约单
+activate DB
+DB --> A : 预约单列表(含申请人、时段、样品数)
+deactivate DB
+A --> PC : 列表数据
+deactivate A
+PC --> P : 展示待审批列表
+
+P -> PC : 选择预约单，查看样品与资质信息
+PC -> A : GET /api/reservations/{id}
+activate A
+A -> DB : 查询预约单、申请人资质与信用分
+activate DB
+DB --> A : 预约单详情
+deactivate DB
+A --> PC : 详情(资质有效、信用分、时段单价)
+deactivate A
+PC --> P : 展示详情与审批意见输入框
+
+alt 审批通过
+  P -> PC : 填写意见并点击"通过"
+  PC -> A : PUT /api/approvals/{id}/approve
+  activate A
+  A -> A : 校验时段仍未被占用
+  A -> DB : UPDATE 预约单 SET status=Approved, version=version+1
+  activate DB
+  DB --> A : 影响行数 1
+  deactivate DB
+  A -> MQ : 发送"审批通过"事件
+  activate MQ
+  MQ -> WX : 推送模板消息(预约时间、机位、注意事项)
+  WX --> MQ : 受理结果
+  MQ --> A : 事件已入队
+  deactivate MQ
+  A --> PC : 200 审批成功
+  deactivate A
+  PC --> P : 列表刷新，该单移出待审批
+else 审批驳回
+  P -> PC : 填写驳回理由并点击"驳回"
+  PC -> A : PUT /api/approvals/{id}/reject
+  activate A
+  A -> A : 校验驳回理由非空
+  A -> DB : UPDATE 预约单 SET status=Rejected, reject_reason=?
+  activate DB
+  DB --> A : 影响行数 1
+  deactivate DB
+  A -> DB : 释放对应时段，触发候补补位
+  A -> MQ : 发送"审批驳回"事件(含驳回理由)
+  activate MQ
+  MQ -> WX : 推送模板消息(驳回理由、可改约入口)
+  WX --> MQ : 受理结果
+  MQ --> A : 事件已入队
+  deactivate MQ
+  A --> PC : 200 驳回成功
+  deactivate A
+  PC --> P : 提示"已驳回并通知申请人"
+end
+
+note over A, DB
+  审批前再次校验时段占用，
+  防止审批期间时段被系统释放或改约
+end note
+@enduml
